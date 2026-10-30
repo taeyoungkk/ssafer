@@ -17,6 +17,19 @@ SSAFER 백엔드 애플리케이션입니다. 게스트 인증, 프로젝트 관
 - AWS SDK for S3
 - JWT
 
+빌드와 라이브러리 버전은 [pom.xml](./pom.xml)을 참고합니다. 인증에는 Spring Security·JWT·OAuth2를 사용하고, API 문서는 SpringDoc OpenAPI로 제공합니다.
+
+## 분석 작업 추적 및 Agent 연동
+
+| 영역 | 구현 |
+| --- | --- |
+| 분석 작업 추적 | `worker_jobs`에 작업 상태를 저장하고 Worker 콜백 처리에 활용합니다. |
+| 재발행 | `@Scheduled` 기반 `WorkerJobRepublishScheduler`가 오래 대기한 작업을 찾아 재발행합니다. |
+| 웹 상태 통지 | DONE / FAILED 상태 전이의 트랜잭션 커밋 이후 SSE 이벤트를 발행합니다. 프론트엔드는 폴링으로도 상태를 조회합니다. |
+| Agent 연결 | Raw WebSocket에서 CONNECT / PING / PONG 및 `TASK_AVAILABLE` 메시지를 처리합니다. |
+| 작업 조회 / 결과 보고 | WebSocket 알림과 별개로 internal Agent API를 통해 pending task를 조회하고 `patchResults`를 보고합니다. |
+| 패치 추적 | 승인 시 `PATCH_APPLY` 작업을 생성하고 적용 결과, 백업 정보, 적용 시각을 기록합니다. |
+
 ## 로컬 실행 준비
 
 ### 1. `.env` 생성
